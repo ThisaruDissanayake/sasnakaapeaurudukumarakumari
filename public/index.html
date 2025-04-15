@@ -1,6 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      // Disable right-click
+      document.addEventListener('contextmenu', (e) => e.preventDefault());
+    
+      // Disable F12, Ctrl+Shift+I, Ctrl+U, etc.
+      document.onkeydown = function (e) {
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && e.key === "I") ||
+          (e.ctrlKey && e.key === "U") ||
+          (e.ctrlKey && e.shiftKey && e.key === "J") ||
+          (e.ctrlKey && e.shiftKey && e.key === "C")
+        ) {
+          return false;
+        }
+      };
+    
+      // Optional: Detect DevTools open
+      setInterval(() => {
+        const before = new Date().getTime();
+        debugger;
+        const after = new Date().getTime();
+        if (after - before > 100) {
+          document.body.innerHTML = '<h1 style="text-align:center; color:red">Developer Tools Detected</h1>';
+        }
+      }, 1000);
+    </script>
+    
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
