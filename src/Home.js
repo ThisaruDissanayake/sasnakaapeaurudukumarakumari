@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import logo from './assets/logosT.png';
-import LeaderboardPreview from './FullLeaderboard';
+
 
 const Home = () => {
   const navigate = useNavigate();
