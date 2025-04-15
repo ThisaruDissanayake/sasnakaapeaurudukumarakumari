@@ -4,6 +4,8 @@ import { db } from './firebaseConfig';
 import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
 import logo1 from './assets/Bg.png';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import imageCompression from 'browser-image-compression';
+
 
 const judges = [
   'Mr.Hasitha Wijesundara',
@@ -42,33 +44,40 @@ const PhotoCompetitionApp = ({ competition }) => {
       reader.readAsDataURL(file);
     });
 
-  const handlePhotoUpload = async (event) => {
-    const files = Array.from(event.target.files);
-
-    for (let file of files) {
-      const base64 = await readFileAsBase64(file);
-      const name = file.name;
-      const district = prompt(`Enter district for ${name}`);
-      const scores = Array(judges.length).fill(0);
-
-      try {
-        await addDoc(collection(db, getCollectionName()), {
-          name,
-          district,
-          scores,
-          imageBase64: base64,
-          timestamp: Date.now()
-        });
-
-        alert(`${name} uploaded successfully!`);
-      } catch (error) {
-        console.error(`Failed to upload ${name}:`, error);
-        alert(`Failed to upload ${name}. Check console for details.`);
-      }
-    }
-
-    fetchPhotos(); // refresh photo list
-  };
+    const handlePhotoUpload = async (event) => {
+        const files = Array.from(event.target.files);
+      
+        for (let file of files) {
+          try {
+            // Compress the image
+            const compressedFile = await imageCompression(file, {
+              maxSizeMB: 0.5, // half a megabyte max
+              maxWidthOrHeight: 1000, // optional
+              useWebWorker: true,
+            });
+      
+            const base64 = await readFileAsBase64(compressedFile);
+            const name = file.name;
+            const district = prompt(`Enter district for ${name}`);
+            const scores = Array(judges.length).fill(0);
+      
+            await addDoc(collection(db, getCollectionName()), {
+              name,
+              district,
+              scores,
+              imageBase64: base64,
+              timestamp: Date.now(),
+            });
+      
+            alert(`${name} uploaded successfully!`);
+          } catch (error) {
+            console.error(`Failed to upload ${file.name}:`, error);
+            alert(`Failed to upload ${file.name}. Check console for details.`);
+          }
+        }
+      
+        fetchPhotos(); // refresh photo list
+      };
 
   const handleScoreChange = async (photoId, judgeIndex, score) => {
     const updatedPhotos = photos.map((photo) =>
@@ -97,6 +106,8 @@ const PhotoCompetitionApp = ({ competition }) => {
       console.error("Failed to save score:", error);
     }
   };
+
+  
 
   const handleDeletePhoto = async (photoId) => {
     if (!window.confirm('Are you sure you want to delete this photo?')) return;
@@ -160,52 +171,55 @@ const PhotoCompetitionApp = ({ competition }) => {
           </div>
         )}
 
-        {(selectedTab === 'judge' || selectedTab === 'leaderboard') && (
-          <div className="photo-grid">
-            {sortedPhotos.map((photo, index) => (
-              <div
-                key={photo.id}
-                className={`card ${selectedTab === 'leaderboard' ? 'highlight' : ''}`}
-              >
-                <img src={photo.imageBase64} alt={photo.name} className="photo-large" />
+{(selectedTab === 'judge' || selectedTab === 'leaderboard') && (
+  <div className="photo-grid">
+    {(selectedTab === 'leaderboard' ? [...photos].sort(
+      (a, b) => getAverageScore(b.scores) - getAverageScore(a.scores)
+    ) : photos).map((photo, index) => (
+      <div
+        key={photo.id}
+        className={`card ${selectedTab === 'leaderboard' ? 'highlight' : ''}`}
+      >
+        <img src={photo.imageBase64} alt={photo.name} className="photo-large" />
 
-                <p><strong>Name:</strong> {photo.name}</p>
-                <p><strong>District:</strong> {photo.district}</p>
+        <p><strong>Name:</strong> {photo.name}</p>
+        <p><strong>District:</strong> {photo.district}</p>
 
-                {selectedTab === 'judge' &&
-                  judges.map((judgeName, idx) => (
-                    <div key={idx} className="judge-score">
-                      <label>{judgeName}'s Score:</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="10"
-                        value={photo.scores?.[idx] || 0}
-                        onChange={(e) =>
-                          handleScoreChange(
-                            photo.id,
-                            idx,
-                            Math.min(10, Math.max(0, e.target.value))
-                          )
-                        }
-                      />
-                    </div>
-                  ))}
+        {selectedTab === 'judge' &&
+          judges.map((judgeName, idx) => (
+            <div key={idx} className="judge-score">
+              <label>{judgeName}'s Score:</label>
+              <input
+                type="number"
+                min="0"
+                max="10"
+                value={photo.scores?.[idx] || 0}
+                onChange={(e) =>
+                  handleScoreChange(
+                    photo.id,
+                    idx,
+                    Math.min(10, Math.max(0, e.target.value))
+                  )
+                }
+              />
+            </div>
+          ))}
 
-                {selectedTab === 'leaderboard' && (
-                  <>
-                    <p><strong>Average Score:</strong> {getAverageScore(photo.scores)}</p>
-                    <p className={`rank rank-${index + 1}`}>Rank #{index + 1}</p>
-                  </>
-                )}
-
-                <button className="delete-btn" onClick={() => handleDeletePhoto(photo.id)}>
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
+        {selectedTab === 'leaderboard' && (
+          <>
+            <p><strong>Average Score:</strong> {getAverageScore(photo.scores)}</p>
+            <p className={`rank rank-${index + 1}`}>Rank #{index + 1}</p>
+          </>
         )}
+
+        <button className="delete-btn" onClick={() => handleDeletePhoto(photo.id)}>
+          Delete
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+
       </div>
     </div>
   );
