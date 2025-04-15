@@ -1,33 +1,20 @@
 // src/ProtectedRoute.js
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { auth } from './firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ correctPassword, children }) => {
-  const [enteredPassword, setEnteredPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export default function ProtectedRoute({ children }) {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (enteredPassword === correctPassword) {
-      setIsAuthenticated(true);
-    } else {
-      alert('Incorrect password');
-    }
-  };
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) setUser(firebaseUser);
+      else navigate('/login');
+    });
+    return () => unsub();
+  }, [navigate]);
 
-  if (!isAuthenticated) {
-    return (
-      <div className="login-screen">
-        <h2>Enter Password to Continue</h2>
-        <input
-          type="password"
-          value={enteredPassword}
-          onChange={(e) => setEnteredPassword(e.target.value)}
-        />
-        <button onClick={handleLogin}>Enter</button>
-      </div>
-    );
-  }
-
-  return children;
-};
-
-export default ProtectedRoute;
+  return user ? children : null;
+}

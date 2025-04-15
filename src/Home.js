@@ -3,10 +3,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import logo from './assets/logosT.png';
-
+import { auth } from './firebaseConfig'; // 🔹 Add this
+import { signOut } from 'firebase/auth'; // 🔹 And this
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate('/login');
+  };
 
   return (
     <div className="home-container">
@@ -23,7 +29,12 @@ const Home = () => {
         </button>
       </div>
 
-     
+      {/* 🔹 Logout Button */}
+      <div className="logout-section">
+        <button className="logout-button" onClick={handleLogout}>
+          🚪 Logout
+        </button>
+      </div>
     </div>
   );
 };
