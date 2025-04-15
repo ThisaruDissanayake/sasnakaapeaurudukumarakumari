@@ -25,7 +25,7 @@ export default function Login() {
     <div className="login-wrapper" style={{ backgroundImage: `url(${bgImage})` }}>
       <div className="login-box">
         <img src={logo} alt="Sasnaka Logo" className="login-logo" />
-        <h2>සස්නක සංසද Login</h2>
+        <h2>Login</h2>
         <input
           placeholder="Email"
           value={email}
