@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/sasnakaapeaurudukumarakumari/static/css/main.5ca58f12.css",
+    "main.js": "/sasnakaapeaurudukumarakumari/static/js/main.c61ea948.js",
+    "static/js/453.c037e82b.chunk.js": "/sasnakaapeaurudukumarakumari/static/js/453.c037e82b.chunk.js",
+    "static/media/Bg.png": "/sasnakaapeaurudukumarakumari/static/media/Bg.f70fe6d14307632029a2.png",
+    "static/media/logosT.png": "/sasnakaapeaurudukumarakumari/static/media/logosT.d3cdce5bfa886eb827ab.png",
+    "index.html": "/sasnakaapeaurudukumarakumari/index.html",
+    "main.5ca58f12.css.map": "/sasnakaapeaurudukumarakumari/static/css/main.5ca58f12.css.map",
+    "main.c61ea948.js.map": "/sasnakaapeaurudukumarakumari/static/js/main.c61ea948.js.map",
+    "453.c037e82b.chunk.js.map": "/sasnakaapeaurudukumarakumari/static/js/453.c037e82b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5ca58f12.css",
+    "static/js/main.c61ea948.js"
+  ]
+}
