@@ -1,13 +1,20 @@
+// src/App.js
 import React from 'react';
-import PhotoCompetitionApp from './PhotoCompetitionApp';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './Home';
+import CompetitionPage from './CompetitionPage';
 import './App.css';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <PhotoCompetitionApp />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/kumara" element={<CompetitionPage competition="kumara" />} />
+        <Route path="/kumari" element={<CompetitionPage competition="kumari" />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
