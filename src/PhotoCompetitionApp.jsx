@@ -18,10 +18,10 @@ const PhotoCompetitionApp = ({ competition }) => {
   const [photos, setPhotos] = useState([]);
   const [selectedTab, setSelectedTab] = useState('upload');
 
-  const getCollectionName = () => {
+  const getCollectionName = useCallback(() => {
     return competition === 'kumara' ? 'photos_kumara' : 'photos_kumari';
-  };
-
+  }, [competition]);
+  
   const fetchPhotos = useCallback(async () => {
     const snapshot = await getDocs(collection(db, getCollectionName()));
     const photoList = snapshot.docs.map((docSnap) => ({
@@ -29,7 +29,8 @@ const PhotoCompetitionApp = ({ competition }) => {
       ...docSnap.data()
     }));
     setPhotos(photoList);
-  }, [competition]);
+  }, [getCollectionName]);
+  
 
   useEffect(() => {
     fetchPhotos();
